@@ -1,7 +1,7 @@
 import express from 'express'
 import passport from 'passport'
 import bcrypt from 'bcryptjs'
-// import User from '../../models/user.js'
+import User from '#models/schemas/user.js'
 
 const router = express.Router()
 
@@ -15,7 +15,7 @@ router.post('/login', passport.authenticate('local', {
 router.get('/register', (req, res) => {
   return res.render('register')
 })
-router.post('/register', async (req, res) => {
+router.post('/register', async (req, res, next) => {
   const { name, email, password, confirmPassword } = req.body
   const errors = []
   if (!name || !email || !password || !confirmPassword) {
@@ -28,7 +28,7 @@ router.post('/register', async (req, res) => {
     return res.render('register', { errors, name, email, password, confirmPassword })
   }
   try {
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ where: { email } })
     if (user) {
       errors.push({ message: '這個 Email 已經註冊過了。' })
       return res.render('register', { errors, name, email, password, confirmPassword })
@@ -38,7 +38,7 @@ router.post('/register', async (req, res) => {
     await User.create({ name, email, password: hash })
     return res.redirect('/user/login')
   } catch (error) {
-    console.log(error)
+    return next(error)
   }
 })
 router.get('/logout', (req, res) => {

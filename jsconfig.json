@@ -6,6 +6,7 @@
       "#configs/*": ["./configs/*"],
       "#middlewares/*": ["./middlewares/*"],
       "#models/*": ["./models/*"],
+      "#routers/*": ["./routers/*"],
     }
   }
 }

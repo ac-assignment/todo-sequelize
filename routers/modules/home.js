@@ -1,17 +1,22 @@
 import express from 'express'
-// import Todo from '../../models/todo.js'
+import User from '#models/schemas/user.js'
+import Todo from '#models/schemas/todo.js'
 const router = express.Router()
 
-router.get('/', async (req, res) => {
-  const userId = req.user._id
+router.get('/', async (req, res, next) => {
+  const userId = req.user.id
   try {
-    // const todos = await Todo.find({ userId })
-    //   .lean()
-    //   .sort({ _id: 'asc' })
-    // res.render('index', { todos })
-    res.render('index')
+    const todos = await Todo.findAll({
+      where: { userId },
+      order: [
+        ['id', 'ASC']
+      ],
+      raw: true,
+      nest: true,
+    })
+    return res.render('index', { todos })
   } catch (error) {
-    console.log(error)
+    return next(error)
   }
 })
 

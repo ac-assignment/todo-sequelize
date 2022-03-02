@@ -1,7 +1,7 @@
 import passport from 'passport'
 import { Strategy as LocalStrategy } from 'passport-local'
 import bcrypt from 'bcryptjs'
-// import User from '../models/user.js'
+import User from '#models/schemas/user.js'
 
 export default (app) => {
   //初始化
@@ -14,7 +14,7 @@ export default (app) => {
     },
     async (req, email, password, done) => {
       try {
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ where: { email }, raw: true, nest: true })
         if (!user) {
           req.flash('error', 'That email is not registered!')
           return done(null, false)
@@ -32,11 +32,11 @@ export default (app) => {
   ))
   //序列化/反序列化
   passport.serializeUser((user, done) => {
-    done(null, user._id)
+    done(null, user.id)
   })
   passport.deserializeUser(async (id, done) => {
     try {
-      const user = await User.findById(id).lean()
+      const user = await User.findByPk(id, { raw: true })
       done(null, user)
     } catch (error) {
       done(error, false)
